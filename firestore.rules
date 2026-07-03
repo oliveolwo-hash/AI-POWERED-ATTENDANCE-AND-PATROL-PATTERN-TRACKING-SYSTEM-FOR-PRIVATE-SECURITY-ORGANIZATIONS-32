@@ -1,0 +1,122 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to get current user's data
+    function getUserData() {
+      let path = /databases/$(database)/documents/users/$(request.auth.uid);
+      return exists(path) ? get(path).data : null;
+    }
+
+    // Helper to check for super admin role
+    function isSuperAdmin() {
+      let userData = getUserData();
+      return request.auth != null && userData != null && (userData.role == 'superAdmin' || userData.role == 'super_admin');
+    }
+
+    // Helper to check for supervisor role
+    function isSupervisor() {
+      let userData = getUserData();
+      return request.auth != null && userData != null && userData.role == 'supervisor';
+    }
+
+    // Admins are identified directly by their UID matching the orgId
+    function isOwner(orgId) {
+      return request.auth != null && request.auth.uid == orgId;
+    }
+
+    // Guards are identified by their user document's orgId
+    function isOrgMember(orgId) {
+      let userData = getUserData();
+      return request.auth != null && (request.auth.uid == orgId || (userData != null && userData.orgId == orgId));
+    }
+
+      // Organizations collection
+      // Only members of the organization or super admins can read. Only owners or super admins can write.
+      match /organizations/{orgId} {
+        allow read: if isOrgMember(orgId) || isSuperAdmin();
+        allow write: if isOwner(orgId) || isSuperAdmin();
+      }
+
+      // Users collection
+      // Read: users can read their own document, supervisors of their org, or super admin.
+      // Additionally, allow reading if the document role is 'superAdmin' so the client can count them.
+      match /users/{userId} {
+        allow read: if request.auth != null && (
+          request.auth.uid == userId ||
+          isOwner(resource.data.orgId) ||
+          isSuperAdmin() ||
+          resource.data.role == 'superAdmin'
+        );
+
+        // Creation rules
+        allow create: if request.auth != null && (
+          isSuperAdmin() ||
+          (isSupervisor() && request.resource.data.role == 'guard') ||
+          (request.auth.uid == userId && request.resource.data.role == 'superAdmin')
+        );
+
+        // Update and delete restrictions
+        allow update, delete: if request.auth != null && (
+          request.auth.uid == userId ||
+          isOwner(resource.data.orgId) ||
+          isSuperAdmin()
+        );
+      }
+
+    // Sites
+    match /sites/{document=**} {
+      allow read: if request.auth != null && (isOrgMember(resource.data.orgId) || isSuperAdmin());
+      allow create: if request.auth != null && (isOwner(request.resource.data.orgId) || isSuperAdmin());
+      allow update, delete: if request.auth != null && (isOwner(resource.data.orgId) || isSuperAdmin());
+    }
+    
+    // Shifts (Guards can update their own shifts for check in/out)
+    match /shifts/{document=**} {
+      allow read: if request.auth != null && (isOrgMember(resource.data.orgId) || isSuperAdmin());
+      allow create: if request.auth != null && (
+        isOwner(request.resource.data.orgId) || 
+        (isOrgMember(request.resource.data.orgId) && request.resource.data.personnelId == request.auth.uid) ||
+        isSuperAdmin()
+      );
+      allow update, delete: if request.auth != null && (
+        isOwner(resource.data.orgId) || 
+        (isOrgMember(resource.data.orgId) && resource.data.personnelId == request.auth.uid) ||
+        isSuperAdmin()
+      );
+    }
+    
+    // Alerts (Guards can send SOS alerts)
+    match /alerts/{document=**} {
+      allow read: if request.auth != null && (isOrgMember(resource.data.orgId) || isSuperAdmin() || resource.data.orgId == 'global');
+      allow create: if request.auth != null && (isOrgMember(request.resource.data.orgId) || isSuperAdmin() || request.resource.data.orgId == 'global');
+      allow update, delete: if request.auth != null && (isOrgMember(resource.data.orgId) || isSuperAdmin() || resource.data.orgId == 'global');
+    }
+
+    // Incidents: Guards can only create their own. Admins can read them.
+    match /incidents/{document=**} {
+      allow read: if request.auth != null && (
+        isOwner(resource.data.orgId) ||
+        (isOrgMember(resource.data.orgId) && (resource.data.guardId == request.auth.uid || isSupervisor())) ||
+        isSuperAdmin()
+      );
+      allow create: if request.auth != null && 
+        isOrgMember(request.resource.data.orgId) && 
+        request.resource.data.guardId == request.auth.uid;
+      allow update, delete: if request.auth != null && (isOwner(resource.data.orgId) || (isOrgMember(resource.data.orgId) && isSupervisor()) || isSuperAdmin());
+    }
+
+    // Activity Logs
+    match /activity_logs/{document=**} {
+      allow read: if request.auth != null && isSuperAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+
+      // Global Settings
+      match /settings/{document=**} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && isSuperAdmin();
+      }
+  }
+}

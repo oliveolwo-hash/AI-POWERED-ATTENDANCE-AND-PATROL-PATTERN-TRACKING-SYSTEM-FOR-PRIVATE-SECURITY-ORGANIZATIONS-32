@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "197399109297",
+    "project_id": "guardtrack-8f613",
+    "storage_bucket": "guardtrack-8f613.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197399109297:android:969c89bf037f00f8ebcc90",
+        "android_client_info": {
+          "package_name": "com.guardtrack.guard_monitoring"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWnH0uvSiNOrbIvqSLgCfTr8Nq1CiwLIM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
