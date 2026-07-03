@@ -1,17 +1,71 @@
-# guard_monitoring
+# AI-Powered Attendance and Patrol Pattern Tracking System for Private Security Organizations
 
-A new Flutter project.
+## Problem & Solution
 
-## Getting Started
+### Problem
+Security companies face significant challenges in supervising security guards, including inaccurate or falsified attendance records, difficulty verifying that guards are physically present at their assigned sites, limited real-time patrol monitoring, and a lack of analytical tools to identify performance irregularities. These challenges reduce operational efficiency, weaken trust between management and guards, and compromise the quality of security services.
 
-This project is a starting point for a Flutter application.
+### Solution
+The Guard Monitoring and Attendance Management System is an AI-driven platform designed to automate guard attendance management, monitor patrol activities, and support supervisors with intelligent analytics. The system enables administrators to manage guards and sites, assign guards to duty stations, record attendance, track patrol activities, and generate reports for informed decision-making. By providing accurate records and improved supervision, the system enhances accountability, efficiency, and overall security operations.
 
-A few resources to get you started if this is your first Flutter project:
+## Setup Instructions
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+### Requirements
+· Flutter SDK (latest version)
+ 
+· Android Studio or VS Code with Flutter extensions
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+· Android or iOS emulator, or a physical device
+
+· Internet connection for Firebase and Mapbox services
+
+### Installation and Configuration
+
+1. clone this repository to your computer.
+
+git clone
+https://github.com/oliveolwo-hash/AI-POWERED-ATTENDANCE-AND-PATROL-PATTERN-TRACKING-SYSTEM-FOR-PRIVATE-SECURITY-ORGANIZATIONS-32.git
+   
+   
+2. Navigate to the project folder:
+   
+   cd AI-POWERED-ATTENDANCE-AND-PATROL-PATTERN-TRACKING-SYSTEM-FOR-PRIVATE-SECURITY-ORGANIZATIONS
+   
+3. Install dependencies:
+   
+   flutter pub get
+
+### Running the Project
+
+1. Start an emulator or connect a physical device.
+   
+2. Run the application:
+   
+   flutter run
+   
+3. To build an APK for Android:
+   
+   flutter build apk
+
+### Configuration
+
+· Firebase services are pre-configured in the project.
+
+· Mapbox API key is included in lib/core/constants.dart.
+
+· Ensure your device has internet access for real-time features.
+
+### Testing
+
+To run unit tests:
+
+flutter test
+
+## Technologies Used
+
+· Flutter & Dart
+
+· Firebase (Authentication, Firestore)
+
+· Mapbox (GPS tracking)
+
